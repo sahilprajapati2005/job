@@ -5,6 +5,7 @@ import { COMPANY_API_END_POINT } from '../../utils/constant';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCompanies, setSearchCompanyByText } from '../../redux/companySlice';
+import { Edit2 } from 'lucide-react';
 
 const Companies = () => {
     const { companies, searchCompanyByText } = useSelector(store => store.company);
@@ -16,7 +17,6 @@ const Companies = () => {
         dispatch(setSearchCompanyByText(input));
     }, [input, dispatch]);
 
-    // Fetch companies hook logic (embedded for simplicity)
     useEffect(() => {
         const fetchCompanies = async () => {
             try {
@@ -38,7 +38,8 @@ const Companies = () => {
         table: { width: '100%', borderCollapse: 'collapse', background: 'white', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' },
         th: { textAlign: 'left', padding: '15px', background: '#f9fafb', borderBottom: '1px solid #eee' },
         td: { padding: '15px', borderBottom: '1px solid #eee' },
-        avatar: { width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }
+        avatar: { width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' },
+        actionBtn: { border: 'none', background: 'transparent', cursor: 'pointer' }
     };
 
     return (
@@ -68,19 +69,33 @@ const Companies = () => {
                     </thead>
                     <tbody>
                         {companies
-                         .filter(company => company.name.toLowerCase().includes(searchCompanyByText.toLowerCase()))
-                         .map((company) => (
-                            <tr key={company._id}>
-                                <td style={styles.td}>
-                                    <img src={company.logo || "https://github.com/shadcn.png"} alt="logo" style={styles.avatar} />
-                                </td>
-                                <td style={styles.td}>{company.name}</td>
-                                <td style={styles.td}>{company.createdAt.split("T")[0]}</td>
-                                <td style={styles.td} align="right">
-                                    <button className="btn btn-outline">Edit</button>
-                                </td>
-                            </tr>
-                        ))}
+                            .filter(company => 
+                                !searchCompanyByText || 
+                                company?.name?.toLowerCase().includes(searchCompanyByText.toLowerCase())
+                            )
+                            .map((company) => (
+                                <tr key={company._id}>
+                                    <td style={styles.td}>
+                                        <img 
+                                            src={company.logo || "https://github.com/shadcn.png"} 
+                                            alt="logo" 
+                                            style={styles.avatar} 
+                                        />
+                                    </td>
+                                    <td style={styles.td}>{company.name}</td>
+                                    {/* FIX IS HERE: Added ?. before split */}
+                                    <td style={styles.td}>{company?.createdAt?.split("T")[0] || "NA"}</td>
+                                    <td style={styles.td} align="right">
+                                        <button 
+                                            style={styles.actionBtn} 
+                                            onClick={() => navigate(`/admin/companies/${company._id}`)}
+                                        >
+                                            <Edit2 size={18} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        }
                     </tbody>
                 </table>
                 {companies.length === 0 && <p style={{textAlign:'center', padding:'20px'}}>No companies found.</p>}

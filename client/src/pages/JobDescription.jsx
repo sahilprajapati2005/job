@@ -32,13 +32,18 @@ const JobDescription = () => {
         try {
             const res = await axios.get(`${APPLICATION_API_END_POINT}/apply/${jobId}`, { withCredentials: true });
             if(res.data.success){
+                // Manually update the state to reflect the change immediately
+                const updatedSingleJob = {...singleJob, applications: [...singleJob.applications, {applicant: user?._id}]};
+                dispatch(setSingleJob(updatedSingleJob)); 
                 toast.success(res.data.message);
             }
         } catch (error) {
-            toast.error(error.response.data.message);
+            // FIX: Gracefully handle the error toast
+            toast.error(error.response?.data?.message || "Something went wrong");
         }
     }
 
+    // Check if user has already applied
     const isApplied = singleJob?.applications?.some(application => application.applicant === user?._id) || false;
 
     return (
@@ -58,6 +63,7 @@ const JobDescription = () => {
                         onClick={applyHandler} 
                         disabled={isApplied}
                         className={`btn ${isApplied ? 'btn-outline' : 'btn-primary'}`}
+                        style={{cursor: isApplied ? 'not-allowed' : 'pointer'}}
                     >
                         {isApplied ? 'Already Applied' : 'Apply Now'}
                     </button>

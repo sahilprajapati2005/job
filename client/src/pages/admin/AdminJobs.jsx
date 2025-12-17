@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import useGetAllAdminJobs from '../../hooks/useGetAllAdminJobs';
 import { Eye, Edit2 } from 'lucide-react';
-import { setSearchCompanyByText } from '@/redux/companySlice'; // Reusing this action for filtering text
+import { setSearchCompanyByText } from '@/redux/companySlice'; 
 
 const AdminJobs = () => {
     useGetAllAdminJobs(); // Fetch admin jobs
@@ -14,7 +14,6 @@ const AdminJobs = () => {
     const { allJobs } = useSelector(store => store.job);
 
     useEffect(() => {
-        // Simple client-side search logic
         dispatch(setSearchCompanyByText(input)); 
     }, [input, dispatch]);
 
@@ -29,8 +28,8 @@ const AdminJobs = () => {
 
     // Filter jobs based on input
     const filteredJobs = allJobs?.filter(job => 
-        job.title.toLowerCase().includes(input.toLowerCase()) || 
-        job.company?.name.toLowerCase().includes(input.toLowerCase())
+        job?.title?.toLowerCase().includes(input.toLowerCase()) || 
+        job?.company?.name?.toLowerCase().includes(input.toLowerCase())
     );
 
     return (
@@ -52,18 +51,19 @@ const AdminJobs = () => {
                 <table style={styles.table}>
                     <thead>
                         <tr>
-                            <th style={styles.th}>Role</th>
                             <th style={styles.th}>Company</th>
+                            <th style={styles.th}>Role</th>
                             <th style={styles.th}>Date</th>
                             <th style={styles.th} align="right">Action</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {/* FIX: Added optional chaining (?) and fallback "NA" to prevent crashes */}
                         {filteredJobs?.map((job) => (
                             <tr key={job._id}>
-                                <td style={styles.td}>{job.title}</td>
-                                <td style={styles.td}>{job.company?.name}</td>
-                                <td style={styles.td}>{job.createdAt.split("T")[0]}</td>
+                                <td style={styles.td}>{job?.company?.name || "No Company"}</td>
+                                <td style={styles.td}>{job?.title}</td>
+                                <td style={styles.td}>{job?.createdAt?.split("T")[0] || "NA"}</td>
                                 <td style={styles.td} align="right">
                                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
                                         <button onClick={() => navigate(`/admin/jobs/${job._id}/applicants`)} title="View Applicants">

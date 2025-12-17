@@ -13,6 +13,11 @@ const CompanyCreate = () => {
     const dispatch = useDispatch();
 
     const registerNewCompany = async () => {
+        if(!companyName.trim()) {
+            toast.error("Company name is required");
+            return;
+        }
+
         try {
             const res = await axios.post(`${COMPANY_API_END_POINT}/register`, { companyName }, {
                 headers: { 'Content-Type': 'application/json' },
@@ -26,6 +31,7 @@ const CompanyCreate = () => {
             }
         } catch (error) {
             console.log(error);
+            // This will show you WHY it failed (e.g., "Company already exists")
             toast.error(error.response?.data?.message || "Failed to create company");
         }
     }
