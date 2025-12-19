@@ -1,15 +1,13 @@
-import express from 'express';
-import { login, register, updateProfile, logout } from '../controller/user.controller.js';
-import isauthenticated from '../middlewares/isauthenticated.js';
-import { singleUpload } from '../middlewares/multer.js'; // Import this
-
+import express from "express";
+import { login, logout, register, updateProfile } from "../controller/user.controller.js";
+import isAuthenticated from "../middlewares/isAuthenticated.js";
+import { singleUpload } from "../middlewares/multer.js";
 
 const router = express.Router();
 
-router.route('/login').post(login);
-router.route('/register').post(register);
-// Add singleUpload middleware here
-router.route('/profile/update').post(isauthenticated, singleUpload, updateProfile); 
-router.route('/logout').get(logout);
+router.route("/register").post(singleUpload, register); // Ensure singleUpload is here
+router.route("/login").post(login);
+router.route("/logout").get(logout);
+router.route("/profile/update").post(isAuthenticated, singleUpload, updateProfile);
 
 export default router;

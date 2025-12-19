@@ -4,12 +4,17 @@ import { Mail, Pen, Phone } from 'lucide-react';
 import AppliedJobTable from '../components/AppliedJobTable';
 import UpdateProfileDialog from '../components/UpdateProfileDialog';
 import { useSelector } from 'react-redux';
+// 1. IMPORT THE HOOK
+import useGetAppliedJobs from '../hooks/useGetAppliedJobs';
 
 const Profile = () => {
+    // 2. CALL THE HOOK HERE (This fetches the data!)
+    useGetAppliedJobs();
+
     const [open, setOpen] = useState(false);
     const { user } = useSelector(store => store.auth);
 
-    const isResume = user?.profile?.resume; // Assuming backend returns a boolean or url
+    const isResume = user?.profile?.resume;
 
     const styles = {
         container: { maxWidth: '800px', margin: '20px auto', padding: '0 20px' },
@@ -49,7 +54,7 @@ const Profile = () => {
                         <h2 style={{ fontSize: '16px', fontWeight: 'bold' }}>Skills</h2>
                         <div style={styles.skillsContainer}>
                             {user?.profile?.skills?.length > 0 ? user.profile.skills.map((item, index) => (
-                                <span key={index} className="badge badge-blue">{item}</span>
+                                <span key={index} className="badge badge-blue" style={{background:'#eee', padding:'5px 10px', borderRadius:'15px', fontSize:'12px'}}>{item}</span>
                             )) : <span>NA</span>}
                         </div>
                     </div>
@@ -62,6 +67,7 @@ const Profile = () => {
 
                 {/* Applied Jobs Section */}
                 <div style={styles.card}>
+                    {/* Now this table will show real data because we called the hook above */}
                     <AppliedJobTable />
                 </div>
             </div>

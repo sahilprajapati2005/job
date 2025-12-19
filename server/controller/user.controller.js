@@ -23,19 +23,11 @@ export const register = async (req, res) => {
             })
         }
 
-        // Handle File Upload (Optional)
         let profilePhoto = "";
         if (req.file) {
-            try {
-                const file = req.file;
-                const fileUri = getDataUri(file);
-                const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-                profilePhoto = cloudResponse.secure_url;
-            } catch (error) {
-                console.log("Cloudinary Upload Error:", error);
-                // You can decide to return error or continue without photo
-                // For now, we continue without photo if upload fails
-            }
+            const fileUri = getDataUri(req.file);
+            const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+            profilePhoto = cloudResponse.secure_url;
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -139,21 +131,38 @@ export const logout = async (req, res) => {
     }
 }
 
+// 🟢 THIS IS THE FIXED UPDATE PROFILE FUNCTION
+// ... keep your imports (User, bcrypt, jwt, etc.) ...
+
+// REPLACE ONLY THE updateProfile FUNCTION WITH THIS:
 export const updateProfile = async (req, res) => {
     try {
         const { fullname, email, phoneNumber, bio, skills } = req.body;
         
         const file = req.file;
         let cloudResponse;
+
+        // 🟢 FIX: Upload logic that keeps the real filename
         if (file) {
             const fileUri = getDataUri(file);
-            cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+            cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+                resource_type: 'auto', 
+                folder: 'career_portal_resumes', 
+                
+                // Use the original name (without extension) as the ID
+                public_id: file.originalname.split('.')[0], 
+                
+                use_filename: true,
+                unique_filename: false, // Don't add random numbers
+                overwrite: true         // Allow updating the file
+            });
         }
 
         let skillsArray;
         if(skills){
             skillsArray = skills.split(",");
         }
+        
         const userId = req.id; // middleware authentication
         let user = await User.findById(userId);
 
@@ -163,17 +172,18 @@ export const updateProfile = async (req, res) => {
                 success: false
             })
         }
-        // updating data
+        
+        // Updating data
         if(fullname) user.fullname = fullname;
         if(email) user.email = email;
         if(phoneNumber)  user.phoneNumber = phoneNumber;
         if(bio) user.profile.bio = bio;
         if(skills) user.profile.skills = skillsArray;
         
-        // resume comes later here...
+        // Resume saving logic
         if(cloudResponse){
-            user.profile.resume = cloudResponse.secure_url; // save the cloudinary url
-            user.profile.resumeOriginalName = file.originalname; // Save the original file name
+            user.profile.resume = cloudResponse.secure_url; 
+            user.profile.resumeOriginalName = file.originalname; 
         }
 
         await user.save();
