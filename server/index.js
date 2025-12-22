@@ -12,6 +12,7 @@ import routerApplication from './routes/application.route.js';
 dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 8000; 
 
 // Middleware
 app.use(express.json());
@@ -22,7 +23,8 @@ app.use(cookieParser());
 const corsOptions = {
     origin: [
         'http://localhost:5173',
-        'https://jazzy-begonia-b5bb52.netlify.app'
+        'https://jazzy-begonia-b5bb52.netlify.app',
+        'https://job-portal-backend-gamma-sepia.vercel.app'
     ],
     credentials: true
 };
@@ -42,11 +44,15 @@ app.use('/api/v1/company', routerCompany);
 app.use('/api/v1/job', routerjob);
 app.use('/api/v1/application', routerApplication);
 
-// ❌ REMOVE app.listen()
-// app.listen(PORT, () => { ... });
-
-// ✅ Connect DB once
-connectDB();
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        connectDB();
+        console.log(`Server is running on port ${PORT}`);
+    });
+} else {
+    // In production (Vercel), we just connect to the DB
+    connectDB();
+}
 
 // ✅ EXPORT APP FOR VERCEL
 export default app;
