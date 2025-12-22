@@ -23,7 +23,7 @@ app.use(cookieParser());
 const corsOptions = {
     origin: [
         'http://localhost:5173',
-        'https://jazzy-begonia-b5bb52.netlify.app',
+        'https://career-portal-s.netlify.app',
         'https://job-portal-backend-gamma-sepia.vercel.app'
     ],
     credentials: true
