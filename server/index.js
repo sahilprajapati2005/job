@@ -3,45 +3,50 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './utils/db.js';
+
 import router from './routes/user.route.js';
 import routerCompany from './routes/company.route.js';
 import routerjob from './routes/job.route.js';
 import routerApplication from './routes/application.route.js';
 
-dotenv.config({});
+dotenv.config();
 
 const app = express();
 
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// 🟢 UPDATE THIS SECTION 🟢
+// CORS
 const corsOptions = {
     origin: [
-        'http://localhost:5173',                  // Allows your local computer
+        'http://localhost:5173',
         'https://jazzy-begonia-b5bb52.netlify.app'
     ],
-    credentials: true,
-}
+    credentials: true
+};
 app.use(cors(corsOptions));
-// -------------------------
 
+// Test route
 app.get("/", (req, res) => {
-    return res.status(200).json({
+    res.status(200).json({
         message: "Backend is running successfully!",
         success: true
     });
 });
 
-const PORT = process.env.PORT || 3000;
-
+// API routes
 app.use('/api/v1/user', router);
 app.use('/api/v1/company', routerCompany);
 app.use('/api/v1/job', routerjob);
 app.use('/api/v1/application', routerApplication);
 
-app.listen(PORT, () => {
-    connectDB()
-    console.log(`Server is running on port ${PORT}`);
-})
+// ❌ REMOVE app.listen()
+// app.listen(PORT, () => { ... });
+
+// ✅ Connect DB once
+connectDB();
+
+// ✅ EXPORT APP FOR VERCEL
+export default app;
