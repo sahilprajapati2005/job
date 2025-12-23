@@ -4,11 +4,9 @@ import App from './App.jsx'
 import './index.css'
 import { Toaster } from 'react-hot-toast'
 import { Provider } from 'react-redux'
-import store from './redux/store'
-import { persistStore } from 'redux-persist'
+// FIX: Import persistor from store
+import store, { persistor } from './redux/store'
 import { PersistGate } from 'redux-persist/integration/react'
-
-const persistor = persistStore(store);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

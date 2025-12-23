@@ -13,7 +13,7 @@ import {
     REGISTER,
 } from 'redux-persist';
 
-// FIX: Manually define storage to prevent import issues
+// Manual storage definition (Keep this if it solves your import issues)
 const storage = {
     getItem: (key) => Promise.resolve(localStorage.getItem(key)),
     setItem: (key, value) => Promise.resolve(localStorage.setItem(key, value)),
@@ -43,5 +43,8 @@ const store = configureStore({
             },
         }),
 });
+
+// FIX: Export the persistor here
+export const persistor = persistStore(store);
 
 export default store;
