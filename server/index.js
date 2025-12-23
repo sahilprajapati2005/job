@@ -24,12 +24,29 @@ const corsOptions = {
     origin: [
         'http://localhost:5173',
         'https://career-portal-s.netlify.app',
-        'https://job-smoky-seven.vercel.app/',
+        'https://job-smoky-seven.vercel.app',
         'https://job-portal-backend-gamma-sepia.vercel.app'
     ],
     credentials: true
 };
 app.use(cors(corsOptions));
+
+// --- FIX: Database Connection Middleware ---
+// This guarantees DB is connected BEFORE any route handler runs
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (error) {
+        console.error("Database connection error in middleware:", error);
+        res.status(500).json({ 
+            message: "Database connection failed", 
+            success: false,
+            error: error.message 
+        });
+    }
+});
+// -------------------------------------------
 
 // Test route
 app.get("/", (req, res) => {
@@ -45,15 +62,13 @@ app.use('/api/v1/company', routerCompany);
 app.use('/api/v1/job', routerjob);
 app.use('/api/v1/application', routerApplication);
 
+// Local Development Server
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
-        connectDB();
         console.log(`Server is running on port ${PORT}`);
     });
-} else {
-    // In production (Vercel), we just connect to the DB
-    connectDB();
 }
+// Note: We removed the "else { connectDB() }" block because 
+// the middleware above now handles it for both Production and Dev.
 
-// ✅ EXPORT APP FOR VERCEL
 export default app;
