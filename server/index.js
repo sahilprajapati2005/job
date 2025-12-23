@@ -24,6 +24,7 @@ const corsOptions = {
     origin: [
         'http://localhost:5173',
         'https://career-portal-s.netlify.app',
+        'https://job-smoky-seven.vercel.app/',
         'https://job-portal-backend-gamma-sepia.vercel.app'
     ],
     credentials: true
